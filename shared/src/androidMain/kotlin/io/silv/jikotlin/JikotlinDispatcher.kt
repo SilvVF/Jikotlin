@@ -7,5 +7,4 @@ actual class JikotlinDispatcher {
     actual fun io(): CoroutineDispatcher {
         return Dispatchers.IO
     }
-
 }

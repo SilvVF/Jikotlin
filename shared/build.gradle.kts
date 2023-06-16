@@ -35,6 +35,12 @@ kotlin {
                 implementation(libs.ktor.serialization.json)
                 implementation(libs.ktor.core)
                 implementation(libs.ktor.cio)
+                implementation(libs.ktor.contentnegotiation)
+            }
+        }
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.junit)
             }
         }
         val commonTest by getting {

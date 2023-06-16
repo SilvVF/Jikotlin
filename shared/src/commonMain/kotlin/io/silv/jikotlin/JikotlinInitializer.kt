@@ -1,9 +1,6 @@
 package io.silv.jikotlin
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
 import kotlin.native.concurrent.ThreadLocal
@@ -21,4 +18,7 @@ public object JikotlinInitializer {
 
     @JvmSynthetic
     public var jikotlinScope: CoroutineScope = CoroutineScope(dispatcher.io())
+
+    @JvmStatic
+    public var jikotlinTimeoutMillis: Long? = null
 }
