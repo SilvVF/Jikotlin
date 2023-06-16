@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization") version "1.8.21"
+    id("maven-publish")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -49,12 +50,34 @@ kotlin {
             }
         }
     }
+
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                groupId = "com.github.SilvVF"
+                artifactId = "Jikotlin"
+                version = "0.0.1z"
+
+                afterEvaluate {
+                    from(components["release"])
+                }
+            }
+        }
+    }
+
 }
+
 
 android {
     namespace = "io.silv.jikotlin"
     compileSdk = 33
     defaultConfig {
         minSdk = 21
+    }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
