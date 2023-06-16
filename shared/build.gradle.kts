@@ -5,8 +5,6 @@ plugins {
     id("maven-publish")
 }
 
-group = "io.silv"
-version = "1.0"
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
@@ -54,15 +52,16 @@ kotlin {
         }
     }
 
-    val publicationsFromMainHost =
-        listOf(jvm()).map { it.name } + "kotlinMultiplatform"
     publishing {
         publications {
-            matching { it.name in publicationsFromMainHost }.all {
-                val targetPublication = this@all
-                tasks.withType<AbstractPublishToMaven>()
-                    .matching { it.publication == targetPublication }
-                    .configureEach { onlyIf { findProperty("isMainHost") == "true" } }
+            create<MavenPublication>("maven") {
+                groupId = "com.silvvf"
+                artifactId = "Jikotlin"
+                version = "1.0.1"
+
+                afterEvaluate {
+                    from(components["kotlin"])
+                }
             }
         }
     }
