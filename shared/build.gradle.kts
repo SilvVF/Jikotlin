@@ -5,6 +5,9 @@ plugins {
     id("maven-publish")
 }
 
+group = "io.silv"
+version = "1.0"
+
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
@@ -51,20 +54,22 @@ kotlin {
         }
     }
 
+    val publicationsFromMainHost =
+        listOf(jvm()).map { it.name } + "kotlinMultiplatform"
     publishing {
         publications {
-            register<MavenPublication>("release") {
-                groupId = "com.github.SilvVF"
-                artifactId = "Jikotlin"
-                version = "0.0.1z"
-
-                afterEvaluate {
-                    from(components["release"])
-                }
+            matching { it.name in publicationsFromMainHost }.all {
+                val targetPublication = this@all
+                tasks.withType<AbstractPublishToMaven>()
+                    .matching { it.publication == targetPublication }
+                    .configureEach { onlyIf { findProperty("isMainHost") == "true" } }
             }
         }
     }
 
+    android {
+        publishLibraryVariants("release", "debug")
+    }
 }
 
 
@@ -73,11 +78,5 @@ android {
     compileSdk = 33
     defaultConfig {
         minSdk = 21
-    }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
     }
 }
