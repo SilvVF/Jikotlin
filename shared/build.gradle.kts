@@ -51,24 +51,6 @@ kotlin {
             }
         }
     }
-
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "com.silvvf"
-                artifactId = "Jikotlin"
-                version = "1.0.1"
-
-                afterEvaluate {
-                    from(components["kotlin"])
-                }
-            }
-        }
-    }
-
-    android {
-        publishLibraryVariants("release", "debug")
-    }
 }
 
 

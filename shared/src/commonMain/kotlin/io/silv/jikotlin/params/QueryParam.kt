@@ -1,12 +1,10 @@
 package io.silv.jikotlin.params
 
-import kotlin.jvm.JvmStatic
+abstract class QueryParam(
+    open val name: String,
+    open val value: String
 
-sealed class QueryParam(
-    val paramName: String,
-    open val paramValue: String
 ) {
-
     companion object {
 
         private fun StringBuilder.appendParam(name: String, value: String) {
@@ -17,21 +15,16 @@ sealed class QueryParam(
 
 
         fun buildUrl(baseUrl: String, queryParams: List<QueryParam?>): String {
-            return buildUrlNotNull(baseUrl, queryParams.filterNotNull())
-        }
-
-
-        fun buildUrlNotNull(baseUrl: String, queryParams: List<QueryParam>): String {
 
             val url = StringBuilder(baseUrl)
 
-            queryParams.forEachIndexed { index, queryParam ->
+            queryParams.filterNotNull().forEachIndexed { index, queryParam ->
                 if(index == 0) {
                     url.append('?')
-                    url.appendParam(queryParam.paramName, queryParam.paramValue)
+                    url.appendParam(queryParam.name, queryParam.value)
                 } else {
                     url.append('&')
-                    url.appendParam(queryParam.paramName, queryParam.paramValue)
+                    url.appendParam(queryParam.name, queryParam.value)
                 }
             }
 

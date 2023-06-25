@@ -5,18 +5,19 @@ import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.silv.jikotlin.params.AnimeFilter
-import io.silv.jikotlin.params.AnimeRating
-import io.silv.jikotlin.params.AnimeType
-import io.silv.jikotlin.params.MangaFilter
-import io.silv.jikotlin.params.MangaType
+import io.silv.jikotlin.params.top.AnimeFilter
+import io.silv.jikotlin.params.top.AnimeRating
+import io.silv.jikotlin.params.top.AnimeType
+import io.silv.jikotlin.params.top.MangaFilter
+import io.silv.jikotlin.params.top.MangaType
 import io.silv.jikotlin.params.QueryParam
 import io.silv.jikotlin.params.StringParam
-import io.silv.jikotlin.types.anime.by_id.AnimeByIdResponse
-import io.silv.jikotlin.types.anime.full_by_id.AnimeFullByIdResponse
-import io.silv.jikotlin.types.top.top_anime.TopAnimeResponse
-import io.silv.jikotlin.types.top.top_manga.TopMangaResponse
-import io.silv.jikotlin.types.top.top_people.TopPeopleResponse
+import io.silv.jikotlin.params.top.ReviewsType
+import io.silv.jikotlin.types.top.TopAnime
+import io.silv.jikotlin.types.top.TopCharacters
+import io.silv.jikotlin.types.top.TopManga
+import io.silv.jikotlin.types.top.TopPeople
+import io.silv.jikotlin.types.top.TopReviews
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.CoroutineContext
@@ -24,10 +25,10 @@ import kotlin.coroutines.CoroutineContext
 
 class JikotlinClientImpl(
     private val client: HttpClient,
-    private val baseUrl: String = JikotlinInitializer.baseUrl,
-    private val dispatcher: CoroutineContext = JikotlinInitializer.jikotlinScope.coroutineContext
 ) {
 
+    private val baseUrl: String = JikotlinInitializer.baseUrl
+    private val dispatcher: CoroutineContext = JikotlinInitializer.jikotlinScope.coroutineContext
     private val timeout = JikotlinInitializer.jikotlinTimeoutMillis
 
     private suspend fun HttpClient.getWithTimeout(
@@ -54,7 +55,7 @@ class JikotlinClientImpl(
         sfw: Boolean? = null,
         page: Int? = null,
         limit: Int? = null
-    ): TopAnimeResponse = withContext(dispatcher) {
+    ): TopAnime = withContext(dispatcher) {
 
         val sfwParam: QueryParam? = StringParam.get("sfw", sfw)
         val pageParam: QueryParam? = StringParam.get("page", page)
@@ -74,7 +75,7 @@ class JikotlinClientImpl(
         filter: MangaFilter? = null,
         page: Int? = null,
         limit: Int? = null,
-    ): TopMangaResponse = withContext(dispatcher) {
+    ): TopManga = withContext(dispatcher) {
 
         val pageParam: QueryParam? = StringParam.get("page", page)
         val limitParam: QueryParam? = StringParam.get("limit", limit)
@@ -91,7 +92,7 @@ class JikotlinClientImpl(
     suspend fun getTopPeople(
         page: Int? = null,
         limit: Int? = null,
-    ): TopPeopleResponse = withContext(dispatcher) {
+    ): TopPeople = withContext(dispatcher) {
 
         val pageParam: QueryParam? = StringParam.get("page", page)
         val limitParam: QueryParam? = StringParam.get("limit", limit)
@@ -108,7 +109,7 @@ class JikotlinClientImpl(
     suspend fun getTopCharacters(
         page: Int? = null,
         limit: Int? = null,
-    ): TopPeopleResponse = withContext(dispatcher) {
+    ): TopCharacters = withContext(dispatcher) {
 
         val pageParam: QueryParam? = StringParam.get("page", page)
         val limitParam: QueryParam? = StringParam.get("limit", limit)
@@ -122,23 +123,24 @@ class JikotlinClientImpl(
             .body()
     }
 
-    suspend fun getAnimeFullById(
-        id: Int
-    ): AnimeFullByIdResponse = withContext(dispatcher) {
+    suspend fun getTopReviews(
+        page: Int? = null,
+        type: ReviewsType? = null,
+        preliminary: Boolean? = null,
+        spoilers: Boolean? = null
+    ): TopReviews = withContext(dispatcher) {
+
+        val pageParam = StringParam.get("page", page)
+        val preliminaryParam = StringParam.get("preliminary", preliminary)
+        val spoilersParam = StringParam.get("spoilers", spoilers)
 
         client.getWithTimeout(
-            urlString = "$baseUrl/anime/$id/full"
+            urlString = QueryParam.buildUrl(
+                baseUrl = "$baseUrl/top/reviews",
+                queryParams = listOf(pageParam, type, preliminaryParam, spoilersParam)
+            )
         )
             .body()
     }
 
-    suspend fun getAnimeById(
-        id: Int
-    ): AnimeByIdResponse = withContext(dispatcher) {
-
-        client.getWithTimeout(
-            urlString = "$baseUrl/anime/$id"
-        )
-            .body()
-    }
 }
